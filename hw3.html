@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>CS 3451 - Homework 3</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><!-- ===================================================================== -->
+<body bgcolor="#fefefe">
+
+<center>
+<h2>CS 3451, Spring 2014</h2>
+<h1>Homework 3: Ray Tracing</h1>
+<strong><font color="red"> Due: 11:55pm, Friday, March 14, 2014</font></strong>
+</center>
+
+<hr><p><!-- ........................................ --></p>
+
+<h2>Objective</h2>
+
+The goal of this project is to write a ray tracing renderer.  Your
+program should be able to read scene data from a file according to a
+defined scene description language.  From this, your program will then
+render an image of the scene and write out the image to a file.  In this
+project we will use just two geometric primitives: <font color="red">spheres and triangles</font>.
+We will implement shadows and reflection, but not refraction.
+
+<hr><p><!-- ........................................ --></p>
+
+<h2>Scene Description Language</h2>
+
+<ul>
+<li><font size="+1"><b>fov  angle</b></font><br>
+<dd>Specifies the field of view (in degrees) for a perspective projection.  The
+viewer's eye position is assumed to be at the origin and to be looking down
+the <font color="red">negative z-axis</font> (giving us a right-handed coordinate system).  The
+y-axis points up.</dd>
+</li><br>
+
+<li><font size="+1"><b>background  r g b</b></font><br>
+<dd>Background color.  If a ray misses all the objects in the scene, the
+pixel should be given this color.</dd>
+</li><br>
+
+<li><font size="+1"><b>light  x y z  r g b</b></font><br>
+<dd>Point light source at position (x,y,z) and its color (r, g, b).
+Your code should allow up to <font color="red">10 light sources</font>.  Any objects in
+your scene should cast shadows from these light sources, of course.</dd>
+</li><br>
+
+<li><font size="+1"><b>surface  Cd<SUB>r</SUB> Cd<SUB>g</SUB> Cd<SUB>b</SUB>  Ca<SUB>r</SUB> Ca<SUB>g</SUB> Ca<SUB>b</SUB>  Cs<SUB>r</SUB> Cs<SUB>g</SUB> Cs<SUB>b</SUB>  P  K<SUB>refl</SUB></b></font><br>
+<dd>This command describes the reflectance properties of a surface, and this
+reflectance should be given to the objects that follow the command in
+the scene description, such as spheres and triangles.  The first three
+values are the diffuse coefficients (red, green, blue), followed by ambient
+and specular coefficients.  Next
+comes the specular power P (the Phong exponent), which says how shiny the
+highlight of the surface should be.  The final value is the reflection
+coefficient (0 = no reflection, 1 = perfect mirror).
+Usually, <CODE>0 <= Cd,Ca,Cs,Krefl <= 1</CODE>.</dd>
+</li><br>
+
+<li><font size="+1"><b>sphere  radius x y z</b></font><br>
+<dd>A sphere with its center at <CODE>(x, y, z)</CODE>.</dd>
+</li><br>
+
+<li><font size="+1"><b>begin</b></font><br>
+<dd>Begins the definition of a polygon.  Should be followed by "vertex"
+commands, and the polygon definition is terminated by an "end".
+</dd>
+</li><br>
+
+<li><font size="+1"><b>vertex  x y z</b></font><br>
+<dd>One vertex of a polygon.  For this project, all of the provided
+polygons will be triangles.  This means you can assume that there will
+be exactly three "vertex" commands between a "begin" and "end".
+</dd>
+</li><br>
+
+<li><font size="+1"><b>end</b></font><br>
+<dd>Ends the definition of a polygon.
+</dd>
+</li><br>
+
+<li><font size="+1"><b>write  filename[.png]</b></font><br>
+<dd>Ray-traces the scene and saves the image to a PNG image file.</dd>
+</li>
+</ul>
+
+Note on color specification:
+Each of the red, green, and blue components range from <font color="red">0.0 to 1.0</font>.
+<p>
+</p><hr>
+<!-- ........................................ -->
+<h2>Code Provided</h2>
+
+<p>
+All the provided source code that you will need for this assignment can be 
+downloaded here: <a href="ray_parser.zip">ray_parser.zip</a>.
+We have supplied some utility functions that you should use to complete this
+assignment. A interpreter routine is provided so that you do not have to write a
+parser for the scene description language. Here are more details about
+the parser:
+</p>
+
+<ul><li><font size="+1" color="blue"><b>interpreter</b></font><br>
+<dd>This routine takes the current active CLI file(which you can switch between 10 of them through numeric keys)
+and parses it into tokens. Those tokens are organized into arrays. For example, the input "background r g b" will
+be put into token[0], token[1], token[2], and token[3]. You can access token[2] if you want to get the green value.
+Based on each token in token[0], your program should do different kinds of stuff 
+discribed in the previous section. By default, three tokens has been handled: "rect", 
+"color", and "write." "rect" token does basic rectangle drawing. "color" changes the color to be 
+filled for the later drawing calls. "write" dumps the current frame into an image, but you will need to add to it to render the scene first.<br>
+<b>Note</b>: You need <font color="red">Processing 1.25</font> or higher to compile this routine. </font></dd>
+</li><br>
+</ul>
+
+<hr>
+<!-- ........................................ -->
+<h2>Scene Files</h2>
+In the directory &quot;<b><font color="red">data</font></b>&quot; are several test
+scenes that are described by .cli files.  Also in that directory are
+the images that should be created by these scene files.  The file "t0.cli"
+is perhaps the most simple image, and you might use this scene as a
+starting point. Pressing keyboard keys 1-9 and 0 calls the 10 test samples respectively.
+<br>
+<b>Note</b>: Don't change the directory name or processing won't reconize those files.
+
+<p><b>Sample Results:</b></p>
+<p>
+<img border="0" src="result/rect.png" width="300" height="300">
+<img border="0" src="result/t0.png" width="300" height="300">
+<img border="0" src="result/t1.png" width="300" height="300">
+<img border="0" src="result/t2.png" width="300" height="300">
+<img border="0" src="result/t3.png" width="300" height="300">
+<img border="0" src="result/c0.png" width="300" height="300">
+<img border="0" src="result/c1.png" width="300" height="300">
+<img border="0" src="result/c2.png" width="300" height="300">
+<img border="0" src="result/c3.png" width="300" height="300">
+<img border="0" src="result/c4.png" width="300" height="300">
+<img border="0" src="result/c5.png" width="300" height="300"></p>
+<p>
+
+<p></p><hr><!-- ........................................ -->
+<h2>Suggested Approach</h2>
+It is probably best to begin by making small changes to the "ray_parser.pde"
+program to see how to add new commands to the CLI interpreter.  After
+you feel comfortable with this, then you can make dummy routines for
+each of the commands that your ray tracer should understand.  Then
+replace each of the dummy routines with real code and you will be done! :-)
+<p>
+
+Once the shell of the program is ready, we suggest creating the main loop
+that creates the primary rays (those from the eye).  Start by printing out
+the information about these rays to make sure that the numbers make sense.
+Once you've got this loop working, then start on the ray/sphere intersection
+routine.  Don't bother shading the sphere correctly at first-- just color it
+anything other than the background color.  Once you've got a round object on
+the screen, then work on the shading of the sphere.  Finally, work on
+ray/triangle intersection.</p>
+
+<p></p>
+<hr><p><!-- ........................................ --></p>
+<h2>Authorship Rules</h2>
+The code that you turn in must be entirely your own.  You are allowed
+to talk to other members of the class and to the instructor and the TAs
+about high-level questions about the assignment. You may not, however, 
+use code that anyone other than yourself has written. 
+Code that is explicitly <STRONG><font color="red">not</font></STRONG> allowed includes code
+taken from the Web, from books, or from any source other than
+yourself.  The only exception to this rule is that you should use the
+parser routines that we provide.  You should not show your code to other
+students.  If you need help with the assignment, seek the help of the
+instructor or the TAs.<p>
+</p>
+
+<hr><!-- ........................................ -->
+<h2>Development Environment</h2>
+
+<p>You must use the <a href="http://processing.org/">Processing</a>
+language which is built on Java.
+The best resource for Processing language questions is the
+<a href="http://processing.org/reference/index.html">online</a> or
+offline Processing language API (found in the "reference" subdirectory
+of the Processing release).</p>
+
+<hr><!-- ........................................ -->
+<h2>What To Turn In</h2>
+<p>Compress the whole folder (not merely the files within
+the folder) into a zip archive submit them to T-square.  The zip archive
+should be included as an attachment.
+The filename should be <font color="red"><b>"last_first_p3.zip"</b></font>,
+so Greg Turk would create "turk_greg_p3.zip" for his homework 3.  When
+unzipped, it will produce the folder "ray_parser" containing the file
+"ray_parser.pde", a directory "data", and other .pde files you created.</p>
+
+<hr>
+<!-- ........................................ --><!-- ===================================================================== --></dl></body></html>
